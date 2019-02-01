@@ -4,6 +4,7 @@ import styled from "styled-components";
 
 import Header from "./Header";
 import Home from "./Home";
+import PlantHome from "./PlantHome"
 
 import { UserInfo } from "react-adal";
 
@@ -12,11 +13,10 @@ import adalContext from "./adalConfig";
 
 const Wrapper = styled.section`
   padding: 0.5em;
-  background: papayawhip;
+  background: #b6bbc4;
   min-height: 100vh;
 `;
 
-const About = () => <h2>About</h2>;
 const Users = () => <h2>Users</h2>;
 
 interface IAppState {
@@ -49,7 +49,7 @@ class App2 extends React.Component<{}, IAppState> {
         <Wrapper>
           <Header user={this.state.curUser}/>
           <Route path="/" exact={true} component={Home} />
-          <Route path="/about/" component={About} />
+          <Route path="/bh1/" component={PlantHome} />
           <Route path="/users/" component={Users} />
         </Wrapper>
       </Router>
