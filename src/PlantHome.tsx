@@ -52,7 +52,11 @@ interface IAppState {
   webTitle: string;
 }
 
-class Home extends React.Component<{}, IAppState> {
+interface IAppProps {
+    match: any;
+}
+
+class Home extends React.Component<IAppProps, IAppState> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -76,15 +80,14 @@ class Home extends React.Component<{}, IAppState> {
     //   });
     // });
     web.lists
-      .getByTitle("ACWW-1 Core")
+      .getById(this.props.match.params.id)
       .defaultView // .views.getByTitle("Test August 8")
       .fields.get()
       .then((item: any) => {
         // console.log(item.Items);
         item.Items.forEach(
             (field:any) => {
-                web.lists.getByTitle("ACWW-1 Core").fields.getByInternalNameOrTitle(field).get().then((thing:any) => {
-                    console.log(thing.Id)
+                web.lists.getById(this.props.match.params.id).fields.getByInternalNameOrTitle(field).get().then((thing:any) => {
                     const objectCopy = Object.assign({}, this.state)
                     objectCopy.fields.push({ id: thing.Id, name: thing.Title, url: "/test"} )
                     objectCopy.filteredFields.push({ id: thing.Id, name: thing.Title, url: "/test"} )
@@ -100,13 +103,13 @@ class Home extends React.Component<{}, IAppState> {
     this.setState({ loading: false });
   }
   public handleSearch(event: any) {
-    // this.setState({
-    //   filteredPlants: this.state.plants.filter(
-    //     e => e.name.toLowerCase().includes(event.target.value.toLowerCase())
-    //     //   ||
-    //     //   e.country.toLowerCase().includes(event.target.value.toLowerCase())
-    //   )
-    // });
+    this.setState({
+      filteredFields: this.state.fields.filter(
+        e => e.name.toLowerCase().includes(event.target.value.toLowerCase())
+        //   ||
+        //   e.country.toLowerCase().includes(event.target.value.toLowerCase())
+      )
+    });
   }
 
   public render() {
@@ -114,11 +117,11 @@ class Home extends React.Component<{}, IAppState> {
       <div>
         <SearchBox
           type="text"
-          placeholder=" Filter plants"
+          placeholder=" Filter fields"
           onChange={this.handleSearch}
         />
         {this.state.fields.length < 1 ? (
-          <h3>Plant list is loading...</h3>
+          <h3>Field list is loading...</h3>
         ) : (
           <Listings plants={this.state.filteredFields} />
         )}

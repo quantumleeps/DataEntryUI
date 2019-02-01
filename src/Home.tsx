@@ -74,7 +74,7 @@ const StyledLink = styled(Link)`
 
 const Listings = (props: any) => {
   const plantBoxes = props.plants.map((e: any) => (
-    <StyledLink key={e.name} to={e.url}>
+    <StyledLink key={e.name} to={props.url + e.id}>
       <PlantBox>
         {e.name}
         <span style={{ fontSize: "1em", float: "right" }}>></span>
@@ -91,7 +91,11 @@ interface IAppState {
   webTitle: string;
 }
 
-class Home extends React.Component<{}, IAppState> {
+interface IAppProps {
+    match: any;
+}
+
+class Home extends React.Component<IAppProps, IAppState> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -110,7 +114,7 @@ class Home extends React.Component<{}, IAppState> {
         console.log(e);
         const objectCopy = Object.assign({}, this.state);
         objectCopy.plants.push({ id: e.Id, name: e.Title, url: "/test" });
-        objectCopy.filteredPlants.push({ name: e.Title, url: "/test" });
+        objectCopy.filteredPlants.push({ id: e.Id, name: e.Title, url: "/test" });
         this.setState(objectCopy);
       });
     });
@@ -149,7 +153,7 @@ class Home extends React.Component<{}, IAppState> {
         {this.state.plants.length < 1 ? (
           <h3>Plant list is loading...</h3>
         ) : (
-          <Listings plants={this.state.filteredPlants} />
+          <Listings url={this.props.match.url} plants={this.state.filteredPlants} />
         )}
       </div>
     );

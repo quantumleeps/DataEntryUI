@@ -24,7 +24,7 @@ interface IAppState {
   loading: boolean
   webTitle: string;
 }
-class App2 extends React.Component<{}, IAppState> {
+class App extends React.Component<{}, IAppState> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -49,7 +49,8 @@ class App2 extends React.Component<{}, IAppState> {
         <Wrapper>
           <Header user={this.state.curUser}/>
           <Route path="/" exact={true} component={Home} />
-          <Route path="/bh1/" component={PlantHome} />
+          {/* <Route path="/" exact={true} component={PlantHome} /> */}
+          <Route path="/:id" component={PlantHome} />
           <Route path="/users/" component={Users} />
         </Wrapper>
       </Router>
@@ -57,4 +58,4 @@ class App2 extends React.Component<{}, IAppState> {
   }
 }
 
-export default App2;
+export default App;
