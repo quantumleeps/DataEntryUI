@@ -6,7 +6,7 @@ import { runWithAdal } from 'react-adal';
 import * as ReactDOM from 'react-dom';
 
 import adalContext from './adalConfig';
-import App from './App';
+import App2 from './App2';
 import registerServiceWorker from './registerServiceWorker';
 
 const DO_NOT_LOGIN = false;
@@ -22,7 +22,7 @@ runWithAdal(adalContext.AuthContext, () => {
         }
       });
       const rootDiv = document.getElementById('root') as HTMLElement;
-      ReactDOM.render(<App />, rootDiv);
+      ReactDOM.render(<App2 />, rootDiv);
       registerServiceWorker();
     });
 }, DO_NOT_LOGIN);
