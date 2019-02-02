@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 import Header from "./Header";
 import Home from "./Home";
-import PlantHome from "./PlantHome"
+import ListHome from "./ListHome"
 
 import { UserInfo } from "react-adal";
 
@@ -50,7 +50,7 @@ class App extends React.Component<{}, IAppState> {
           <Header user={this.state.curUser}/>
           <Route path="/" exact={true} component={Home} />
           {/* <Route path="/" exact={true} component={PlantHome} /> */}
-          <Route path="/:id" component={PlantHome} />
+          <Route path="/:id" component={ListHome} />
           <Route path="/users/" component={Users} />
         </Wrapper>
       </Router>

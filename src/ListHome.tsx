@@ -48,6 +48,7 @@ const Listings = (props: any) => {
 interface IAppState {
   fields: any[];
   filteredFields: any[];
+  listTitle: string;
   loading: boolean;
   webTitle: string;
 }
@@ -56,12 +57,13 @@ interface IAppProps {
     match: any;
 }
 
-class Home extends React.Component<IAppProps, IAppState> {
+class ListHome extends React.Component<IAppProps, IAppState> {
   constructor(props: any) {
     super(props);
     this.state = {
       fields: [],
       filteredFields: [],
+      listTitle: "",
       loading: true,
       webTitle: ""
     };
@@ -70,15 +72,6 @@ class Home extends React.Component<IAppProps, IAppState> {
 
   public componentWillMount() {
     const web = new Web(endpoint + "/operations");
-    // web.lists.get().then((item: any) => {
-    //   item.map((e: any) => {
-    //     console.log(e);
-    //     const objectCopy = Object.assign({}, this.state);
-    //     objectCopy.plants.push({ id: e.Id, name: e.Title, url: "/test" });
-    //     objectCopy.filteredPlants.push({ name: e.Title, url: "/test" });
-    //     this.setState(objectCopy);
-    //   });
-    // });
     web.lists
       .getById(this.props.match.params.id)
       .defaultView // .views.getByTitle("Test August 8")
@@ -97,6 +90,10 @@ class Home extends React.Component<IAppProps, IAppState> {
             }
         )
       });
+      web.lists
+      .getById(this.props.match.params.id).get().then((list:any) => 
+        this.setState({listTitle: list.Title})
+      )
   }
 
   public componentDidMount() {
@@ -119,7 +116,7 @@ class Home extends React.Component<IAppProps, IAppState> {
           type="text"
           placeholder=" Filter fields"
           onChange={this.handleSearch}
-        />
+        /><span style={{ padding: "8px", fontSize: "2em", float: "right" }}>{this.state.listTitle}</span>
         {this.state.fields.length < 1 ? (
           <h3>Field list is loading...</h3>
         ) : (
@@ -130,4 +127,4 @@ class Home extends React.Component<IAppProps, IAppState> {
   }
 }
 
-export default Home;
+export default ListHome;
