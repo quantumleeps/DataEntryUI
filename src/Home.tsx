@@ -74,7 +74,7 @@ const StyledLink = styled(Link)`
 
 const Listings = (props: any) => {
   const plantBoxes = props.plants.map((e: any) => (
-    <StyledLink key={e.name} to={props.url + e.id}>
+    <StyledLink key={e.name} to={props.url + "list/" + e.id}>
       <PlantBox>
         {e.name}
         <span style={{ fontSize: "1em", float: "right" }}>></span>

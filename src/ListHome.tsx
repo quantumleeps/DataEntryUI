@@ -6,6 +6,8 @@ import { Link } from "react-router-dom";
 import { Web } from "@pnp/sp";
 import { endpoint } from "./adalConfig";
 
+import Graph from "./Graph"
+
 const DataBox = styled.div`
   background-color: white;
   color: black;
@@ -38,6 +40,7 @@ const Listings = (props: any) => {
     <StyledLink key={e.name} to={e.url}>
       <DataBox>
         {e.name}
+        <Graph />
         {/* <span style={{ fontSize: "1em", float: "right" }}>></span> */}
       </DataBox>
     </StyledLink>

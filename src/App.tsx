@@ -2,6 +2,7 @@ import * as React from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import styled from "styled-components";
 
+import Graph from "./Graph"
 import Header from "./Header";
 import Home from "./Home";
 import ListHome from "./ListHome"
@@ -16,8 +17,6 @@ const Wrapper = styled.section`
   background: #b6bbc4;
   min-height: 100vh;
 `;
-
-const Users = () => <h2>Users</h2>;
 
 interface IAppState {
   curUser: Partial<UserInfo>;
@@ -50,8 +49,8 @@ class App extends React.Component<{}, IAppState> {
           <Header user={this.state.curUser}/>
           <Route path="/" exact={true} component={Home} />
           {/* <Route path="/" exact={true} component={PlantHome} /> */}
-          <Route path="/:id" component={ListHome} />
-          <Route path="/users/" component={Users} />
+          <Route path="/list/:id" exact={true} component={ListHome} />
+          <Route path="/graph/" component={Graph} />
         </Wrapper>
       </Router>
     );
