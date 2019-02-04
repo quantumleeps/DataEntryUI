@@ -14,6 +14,8 @@ import { endpoint } from "./adalConfig";
 
 import { Link } from "react-router-dom";
 
+import DataInputBox from "./DataInputBox";
+
 const Parent = styled.div`
   display: flex;
   flex-direction: row;
@@ -78,17 +80,18 @@ const BoxChild = styled.div`
   -moz-box-shadow: 1px 1px 6px #000000;
   -webkit-box-shadow: 1px 1px 6px #000000;
   box-shadow: 1px 1px 6px #000000;
-  //   border: 1px solid green;
+  border: ${props => props.valid ? "2px solid green" : "none"}
 `;
 
 const SearchBox = styled.input`
   height: 24px;
   font-size: 20px;
   width: 80%;
+  border-radius: 4px;
 `;
 
 const Button = styled.button`
-  padding: 8px 24px;
+  padding: 5px 18px;
   background: white;
   color: green
   border: 2px solid green;
@@ -124,19 +127,19 @@ const BoxTitle = styled.div`
   justify-content: space-between;
 `;
 
-const BoxInput = styled.input`
-  height: 53px;
-  font-size: 45px;
-  width: 100%;
-  border: 2px dotted black;
-  border-radius: 5px;
+// const BoxInput = styled.input`
+//   height: 53px;
+//   font-size: 45px;
+//   width: 100%;
+//   border: 2px dotted black;
+//   border-radius: 5px;
 
-  :focus {
-    border: 2px solid blue;
-    outline: none;
-    border-radius: 5px;
-  }
-`;
+//   :focus {
+//     border: 2px solid blue;
+//     outline: none;
+//     border-radius: 5px;
+//   }
+// `;
 
 const TitleLink = styled(Link)`
   text-decoration: none;
@@ -149,12 +152,12 @@ const TitleLink = styled(Link)`
 
 const Listings = (props: any) => {
   const dataBoxes = props.datapoints.map((e: any) => (
-    <BoxChild key={e.id}>
+    <BoxChild key={e.id} valid={e.valid}>
       <BoxTitle>
         <div>{e.name}</div>
         {/* {e.valid && <FaCheck style={{ color: "green" }} />} */}
       </BoxTitle>
-      <BoxInput type="text" placeholder="Enter data here..." />
+      <DataInputBox units={e.units} valid={e.valid} />
     </BoxChild>
   ));
   return dataBoxes;
@@ -193,29 +196,34 @@ class ListHome extends React.Component<IAppProps, IAppState> {
       .defaultView // .views.getByTitle("Test August 8")
       .fields.get()
       .then((item: any) => {
+        // console.log(item)
         if (item.length > 0) {
-          this.setState({ loading: false })
+          this.setState({ loading: false });
         }
         // console.log(item.Items);
-        item.Items.forEach((field: any) => {
+        item.Items.forEach((field: any, index: number) => {
           web.lists
             .getById(this.props.match.params.id)
             .fields.getByInternalNameOrTitle(field)
             .get()
             .then((thing: any) => {
-              const objectCopy = Object.assign({}, this.state);
-              objectCopy.datapoints.push({
-                id: thing.Id,
-                name: thing.Title,
-                url: "/test"
-              });
-              objectCopy.filteredDatapoints.push({
-                id: thing.Id,
-                name: thing.Title,
-                url: "/test"
-              });
-              this.setState(objectCopy);
-              console.log(this.state);
+              if (thing.Title !== "datetime") {
+                const objectCopy = Object.assign({}, this.state);
+                const pushData = {
+                  id: thing.Id,
+                  max: thing.MaximumValue,
+                  min: thing.MinimumValue,
+                  name: thing.Title,
+                  order: index,
+                  units: thing.Description.length
+                    ? JSON.parse(thing.Description).units
+                    : null,
+                  valid: false
+                }
+                objectCopy.datapoints.push(pushData);
+                objectCopy.filteredDatapoints.push(pushData);
+                this.setState(objectCopy);
+              }
             });
         });
       });
@@ -234,6 +242,12 @@ class ListHome extends React.Component<IAppProps, IAppState> {
   public onLogOut() {
     adalContext.LogOut();
   }
+
+  // public isValid(value:number, min:number, max:number) {
+  //   value > min && value < max
+  //   ? true
+  //   : false
+  // }
 
   public handleClick() {
     console.log("it got clicked");
@@ -272,7 +286,11 @@ class ListHome extends React.Component<IAppProps, IAppState> {
         {this.state.loading ? (
           <h1>Loading...</h1>
         ) : (
-          <Listings datapoints={this.state.filteredDatapoints} />
+          <Listings
+            datapoints={this.state.filteredDatapoints.sort(
+              (a: any, b: any) => a.order - b.order
+            )}
+          />
         )}
       </Parent>
     );

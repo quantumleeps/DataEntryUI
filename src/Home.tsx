@@ -82,23 +82,24 @@ const BoxChild = styled.div`
 const SearchBox = styled.input`
   height: 24px;
   font-size: 20px;
-  width: 80%;
+  width: 100%;
+  border-radius: 4px;
 `;
 
-const Button = styled.button`
-  padding: 8px 24px;
-  background: white;
-  color: green
-  border: 2px solid green;
-  font-size: 12px;
-  border-radius: 5px;
-  cursor: pointer;
+// const Button = styled.button`
+//   padding: 5px 18px;
+//   background: white;
+//   color: green
+//   border: 2px solid green;
+//   font-size: 12px;
+//   border-radius: 5px;
+//   cursor: pointer;
 
-  :hover {
-      background: green;
-      color: white;
-  }
-`;
+//   :hover {
+//       background: green;
+//       color: white;
+//   }
+// `;
 
 const SmallButton = styled.button`
   padding: 2px 6px;
@@ -207,7 +208,6 @@ class Home extends React.Component<IAppProps, IAppState> {
         </AuthenticatedUsername>
         <SearchChild>
           <SearchBox onChange={this.handleSearch} type="text" placeholder="Search..." />
-          <Button onClick={this.handleClick}>Save</Button>
         </SearchChild>
         {this.state.loading ? <h1>Loading...</h1> : <Listings url={this.props.match.url} plants={this.state.filteredPlants} />}
         
