@@ -41,6 +41,8 @@ const InputBox = styled.input`
     outline: none;
     height: 55px;
     font-size: 48px;
+    border-radius: 0px !important;
+    -webkit-appearance: none;
 
     :focus {
         border: 2px dotted blue;
