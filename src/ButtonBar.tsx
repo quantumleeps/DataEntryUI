@@ -29,7 +29,11 @@ const StyledButton = styled.button`
     }
 `;
 
-class ButtonBar extends React.Component<{},{}> {
+interface IAppProps {
+    actionSubmit: any;
+}
+
+class ButtonBar extends React.Component<IAppProps,{}> {
     constructor(props:any) {
         super(props)
     }
@@ -38,7 +42,7 @@ class ButtonBar extends React.Component<{},{}> {
         return (
             <Wrapper>
                 <StyledButton type={"Danger"}>Reset</StyledButton>
-                <StyledButton type={"Success"}>Save to Database</StyledButton>
+                <StyledButton onClick={this.props.actionSubmit} type={"Success"}>Save to Database</StyledButton>
             </Wrapper>
         )
     }

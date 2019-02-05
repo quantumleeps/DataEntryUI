@@ -6,12 +6,16 @@ import { UserInfo } from "react-adal";
 
 import adalContext from "./adalConfig";
 
+import { ItemAddResult } from "@pnp/sp";
+
 import { Web } from "@pnp/sp";
 import { endpoint } from "./adalConfig";
 
 import ButtonBar from "./ButtonBar";
 import DataInputBox from "./DataInputBox";
 import HeaderBar from "./HeaderBar";
+
+import { withRouter } from 'react-router-dom'
 
 const Parent = styled.div`
   display: flex;
@@ -84,6 +88,7 @@ const Listings = (props: any) => {
 };
 
 interface IAppProps {
+  history: any;
   match: any;
 }
 
@@ -108,6 +113,7 @@ class ListHome extends React.Component<IAppProps, IAppState> {
     this.handleClick = this.handleClick.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.handleDataInput = this.handleDataInput.bind(this);
+    this.submitRecord = this.submitRecord.bind(this);
   }
 
   public componentWillMount() {
@@ -128,10 +134,12 @@ class ListHome extends React.Component<IAppProps, IAppState> {
             .fields.getByInternalNameOrTitle(field)
             .get()
             .then((thing: any) => {
+              // console.log(thing)
               if (thing.Title !== "datetime") {
                 const objectCopy = Object.assign({}, this.state);
                 const pushData = {
                   id: thing.Id,
+                  internalName: thing.EntityPropertyName,
                   invalid: false,
                   max: thing.MaximumValue,
                   min: thing.MinimumValue,
@@ -146,6 +154,7 @@ class ListHome extends React.Component<IAppProps, IAppState> {
                 objectCopy.datapoints.push(pushData);
                 this.setState(objectCopy);
               }
+              console.log(this.state);
             });
         });
       });
@@ -203,10 +212,38 @@ class ListHome extends React.Component<IAppProps, IAppState> {
     });
   }
 
+  public createPayload(datapoints:any[]) {
+    const arrayToObject = (array:any[], keyField:any) =>
+      array.reduce((obj, item) => {
+        obj[item[keyField]] = parseFloat(item.value);
+        return obj;
+      }, {});
+    return arrayToObject(datapoints, "internalName");
+  }
+
+  public submitRecord() {
+    const web = new Web(endpoint + "/operations");
+    // add an item to the list
+    web.lists
+      .getById(this.props.match.params.id)
+      .items.add(this.createPayload(this.state.datapoints))
+      .then((iar: ItemAddResult) => {
+        console.log(iar);
+      });
+    // console.log("this is just a test");
+    // console.log(this.createPayload(this.state.datapoints))
+    this.props.history.push('/')
+  }
+
   public render() {
     return (
       <Parent>
-        <HeaderBar home={false} title={this.state.curTitle} user={this.state.curUser.userName} logoutAction={this.onLogOut}/>
+        <HeaderBar
+          home={false}
+          title={this.state.curTitle}
+          user={this.state.curUser.userName}
+          logoutAction={this.onLogOut}
+        />
         {this.state.loading ? (
           <h1>Loading...</h1>
         ) : (
@@ -221,10 +258,10 @@ class ListHome extends React.Component<IAppProps, IAppState> {
               .sort((a: any, b: any) => a.order - b.order)}
           />
         )}
-        {!this.state.loading && <ButtonBar />}
+        {!this.state.loading && <ButtonBar actionSubmit={this.submitRecord} />}
       </Parent>
     );
   }
 }
 
-export default ListHome;
+export default withRouter(ListHome);
