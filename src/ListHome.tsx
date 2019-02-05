@@ -80,7 +80,7 @@ const BoxChild = styled.div`
   -moz-box-shadow: 1px 1px 6px #000000;
   -webkit-box-shadow: 1px 1px 6px #000000;
   box-shadow: 1px 1px 6px #000000;
-  border: ${props => props.valid ? "2px solid green" : "none"}
+  border: ${props => (props.hasValue ? !props.invalid && props.valid ? "3px solid green" : "3px solid red" : "none")}
 `;
 
 const SearchBox = styled.input`
@@ -151,13 +151,20 @@ const TitleLink = styled(Link)`
 `;
 
 const Listings = (props: any) => {
-  const dataBoxes = props.datapoints.map((e: any) => (
-    <BoxChild key={e.id} valid={e.valid}>
+  const dataBoxes = props.datapoints.map((e: any, i: any) => (
+    <BoxChild key={e.id} valid={e.valid} invalid={e.invalid} hasValue={e.value.length>0}>
       <BoxTitle>
         <div>{e.name}</div>
         {/* {e.valid && <FaCheck style={{ color: "green" }} />} */}
       </BoxTitle>
-      <DataInputBox units={e.units} valid={e.valid} />
+      <DataInputBox
+        name={e.id}
+        invalid={e.invalid}
+        action={props.action}
+        units={e.units}
+        valid={e.valid}
+        value={e.value}
+      />
     </BoxChild>
   ));
   return dataBoxes;
@@ -171,8 +178,8 @@ interface IAppState {
   curTitle: string;
   curUser: any;
   datapoints: any[];
-  filteredDatapoints: any[];
   loading: boolean;
+  searchFilter: "";
 }
 
 class ListHome extends React.Component<IAppProps, IAppState> {
@@ -182,11 +189,12 @@ class ListHome extends React.Component<IAppProps, IAppState> {
       curTitle: "",
       curUser: {},
       datapoints: [],
-      filteredDatapoints: [],
-      loading: true
+      loading: true,
+      searchFilter: "",
     };
     this.handleClick = this.handleClick.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
+    this.handleDataInput = this.handleDataInput.bind(this);
   }
 
   public componentWillMount() {
@@ -211,6 +219,7 @@ class ListHome extends React.Component<IAppProps, IAppState> {
                 const objectCopy = Object.assign({}, this.state);
                 const pushData = {
                   id: thing.Id,
+                  invalid: false,
                   max: thing.MaximumValue,
                   min: thing.MinimumValue,
                   name: thing.Title,
@@ -218,10 +227,10 @@ class ListHome extends React.Component<IAppProps, IAppState> {
                   units: thing.Description.length
                     ? JSON.parse(thing.Description).units
                     : null,
-                  valid: false
-                }
+                  valid: false,
+                  value: ""
+                };
                 objectCopy.datapoints.push(pushData);
-                objectCopy.filteredDatapoints.push(pushData);
                 this.setState(objectCopy);
               }
             });
@@ -254,12 +263,34 @@ class ListHome extends React.Component<IAppProps, IAppState> {
   }
 
   public handleSearch(event: any) {
-    this.setState({
-      filteredDatapoints: this.state.datapoints.filter(e =>
-        e.name.toLowerCase().includes(event.target.value.toLowerCase())
-      )
+    this.setState({ searchFilter: event.target.value });
+    // console.log(this.state);
+  }
+
+  public checkValid(value: number, min: number, max: number) {
+    if (value > min) {
+      if (value < max) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  public handleDataInput(event: any) {
+    this.state.datapoints.forEach((item, index) => {
+      if (item.id === event.target.name) {
+
+        const datapoints = [...this.state.datapoints];
+        datapoints[index] = { ...datapoints[index], valid: this.checkValid(event.target.value, item.min, item.max) };
+        datapoints[index] = { ...datapoints[index], invalid: !this.checkValid(event.target.value, item.min, item.max) };
+        datapoints[index] = { ...datapoints[index], value: event.target.value}
+        this.setState({ datapoints });
+      }
     });
-    console.log(this.state);
+    // console.log(this.state);
   }
 
   public render() {
@@ -287,7 +318,10 @@ class ListHome extends React.Component<IAppProps, IAppState> {
           <h1>Loading...</h1>
         ) : (
           <Listings
-            datapoints={this.state.filteredDatapoints.sort(
+            action={this.handleDataInput}
+            datapoints={this.state.datapoints.filter(e =>
+              e.name.toLowerCase().includes(this.state.searchFilter.toLowerCase())
+            ).sort(
               (a: any, b: any) => a.order - b.order
             )}
           />

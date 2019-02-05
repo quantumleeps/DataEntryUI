@@ -4,11 +4,6 @@ import styled from "styled-components"
 
 import { FaCheck } from "react-icons/fa"
 
-interface IAppProps {
-    units: string;
-    valid: boolean;
-}
-
 const InputWrapper = styled.div`
     width: 100%;
     display: flex;
@@ -16,7 +11,7 @@ const InputWrapper = styled.div`
 
 const Icon = styled.div`
     padding: 10px;
-    background: green;
+    background: ${props => (props.color)};
     color: white;
     min-width: 50px;
     border-radius: 6px 0 0 6px;
@@ -50,6 +45,15 @@ const InputBox = styled.input`
     }
 `;
 
+interface IAppProps {
+    action: any;
+    invalid: boolean;
+    name: any;
+    units: string;
+    valid: boolean;
+    value: any;
+}
+
 class DataInputBox extends React.Component<IAppProps,{}> {
     constructor(props:any) {
         super(props)
@@ -59,8 +63,9 @@ class DataInputBox extends React.Component<IAppProps,{}> {
     public render() {
         return (
             <InputWrapper>
-                {this.props.valid && <Icon><FaCheck /></Icon>}
-                <InputBox />
+                {this.props.value.length > 0 && this.props.valid && !this.props.invalid && <Icon color="green"><FaCheck /></Icon>}
+                {this.props.value.length > 0 && !this.props.valid && this.props.invalid && <Icon color="red"><FaCheck /></Icon>}
+                <InputBox value={this.props.value} name={this.props.name} onChange={this.props.action}/>
                 {this.props.units !== null && <Units>{this.props.units}</Units>}
             </InputWrapper>
         )
