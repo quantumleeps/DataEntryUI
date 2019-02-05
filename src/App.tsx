@@ -10,6 +10,10 @@ import { UserInfo } from "react-adal";
 
 import adalContext from "./adalConfig";
 
+import Alert from 'react-s-alert';
+
+import './react-s-alert-default.css';
+
 
 const Wrapper = styled.section`
   padding: 0.5em;
@@ -49,6 +53,7 @@ class App extends React.Component<{}, IAppState> {
           <Route path="/" exact={true} component={Home} />
           {/* <Route path="/" exact={true} component={PlantHome} /> */}
           <Route path="/list/:id" exact={true} component={ListHome} />
+          <Alert stack={{limit: 3}} />
         </Wrapper>
       </Router>
     );

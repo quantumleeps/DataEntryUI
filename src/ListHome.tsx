@@ -17,6 +17,8 @@ import HeaderBar from "./HeaderBar";
 
 import { withRouter } from "react-router-dom";
 
+import Alert from "react-s-alert"
+
 const Parent = styled.div`
   display: flex;
   flex-direction: row;
@@ -187,13 +189,18 @@ class ListHome extends React.Component<IAppProps, IAppState> {
   }
 
   public updateFormValidity() {
+    let numValid = 0
     let numInvalid = 0
     this.state.datapoints.forEach((datapoint:any) => {
-      datapoint.validityState === 2
+      datapoint.validityState === 2 
       ? numInvalid++
       : numInvalid = numInvalid
+      datapoint.validityState === 1
+      ? numValid++
+      : numValid = numValid
     })
     numInvalid > 0 ? this.setState({ formIsValid: false }) : this.setState({ formIsValid: true })
+    numValid < 1 ? this.setState({ formIsValid: false }) : this.setState({ formIsValid: true })
   }
 
   public handleDataInput(event: any) {
@@ -226,14 +233,19 @@ class ListHome extends React.Component<IAppProps, IAppState> {
 
   public submitRecord() {
     const web = new Web(endpoint + "/operations");
-    // add an item to the list
-    web.lists
+    // add an item to the list if there is an
+    // internet connection, otherwise alert the user
+    if (navigator.onLine) {
+      web.lists
       .getById(this.props.match.params.id)
       .items.add(this.createPayload(this.state.datapoints))
       .then((iar: ItemAddResult) => {
         console.log(iar);
       });
     this.props.history.push("/");
+    } else {
+      Alert.warning("You don't have an internet connection. Please go get one.", { position: "top" })
+    }
   }
 
   public refreshPage() {
