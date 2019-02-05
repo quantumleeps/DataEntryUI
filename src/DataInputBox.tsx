@@ -41,7 +41,7 @@ const InputBox = styled.input`
     font-size: 48px;
 
     :focus {
-        border: 2px solid orange;
+        border: 2px dotted blue;
     }
 `;
 
