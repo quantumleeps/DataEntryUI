@@ -110,31 +110,29 @@ class ListHome extends React.Component<IAppProps, IAppState> {
       loading: true,
       searchFilter: ""
     };
-    this.handleClick = this.handleClick.bind(this);
+
     this.handleSearch = this.handleSearch.bind(this);
     this.handleDataInput = this.handleDataInput.bind(this);
     this.submitRecord = this.submitRecord.bind(this);
+    this.refreshPage = this.refreshPage.bind(this);
   }
 
   public componentWillMount() {
     const web = new Web(endpoint + "/operations");
     web.lists
       .getById(this.props.match.params.id)
-      .defaultView // .views.getByTitle("Test August 8")
+      .defaultView
       .fields.get()
       .then((item: any) => {
-        // console.log(item)
         if (item.length > 0) {
           this.setState({ loading: false });
         }
-        // console.log(item.Items);
         item.Items.forEach((field: any, index: number) => {
           web.lists
             .getById(this.props.match.params.id)
             .fields.getByInternalNameOrTitle(field)
             .get()
             .then((thing: any) => {
-              // console.log(thing)
               if (thing.Title !== "datetime") {
                 const objectCopy = Object.assign({}, this.state);
                 const pushData = {
@@ -153,7 +151,6 @@ class ListHome extends React.Component<IAppProps, IAppState> {
                 objectCopy.datapoints.push(pushData);
                 this.setState(objectCopy);
               }
-              // console.log(this.state);
             });
         });
       });
@@ -171,10 +168,6 @@ class ListHome extends React.Component<IAppProps, IAppState> {
 
   public onLogOut() {
     adalContext.LogOut();
-  }
-
-  public handleClick() {
-    console.log("it got clicked");
   }
 
   public handleSearch(event: any) {
@@ -200,7 +193,6 @@ class ListHome extends React.Component<IAppProps, IAppState> {
       ? numInvalid++
       : numInvalid = numInvalid
     })
-    console.log(numInvalid)
     numInvalid > 0 ? this.setState({ formIsValid: false }) : this.setState({ formIsValid: true })
   }
 
@@ -241,9 +233,11 @@ class ListHome extends React.Component<IAppProps, IAppState> {
       .then((iar: ItemAddResult) => {
         console.log(iar);
       });
-    // console.log("this is just a test");
-    // console.log(this.createPayload(this.state.datapoints))
     this.props.history.push("/");
+  }
+
+  public refreshPage() {
+    location.reload()
   }
 
   public render() {
@@ -269,7 +263,7 @@ class ListHome extends React.Component<IAppProps, IAppState> {
               .sort((a: any, b: any) => a.order - b.order)}
           />
         )}
-        {!this.state.loading && <ButtonBar submitEnabled={this.state.formIsValid} actionSubmit={this.submitRecord} />}
+        {!this.state.loading && <ButtonBar submitEnabled={this.state.formIsValid} actionReset={this.refreshPage} actionSubmit={this.submitRecord} />}
       </Parent>
     );
   }

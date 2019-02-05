@@ -119,7 +119,6 @@ class Home extends React.Component<IAppProps, IAppState> {
       loading: true,
       plants: []
     };
-    this.handleClick = this.handleClick.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
   }
 
@@ -142,17 +141,12 @@ class Home extends React.Component<IAppProps, IAppState> {
     adalContext.LogOut();
   }
 
-  public handleClick() {
-    console.log("it got clicked");
-  }
-
   public handleSearch(event: any) {
     this.setState({
       filteredPlants: this.state.plants.filter(e =>
         e.name.toLowerCase().includes(event.target.value.toLowerCase())
       )
     });
-    console.log(this.state);
   }
 
   public render() {

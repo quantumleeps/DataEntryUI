@@ -59,6 +59,7 @@ const DisabledButton = styled.button`
 `;
 
 interface IAppProps {
+  actionReset: any;
   actionSubmit: any;
   submitEnabled: boolean;
 }
@@ -71,7 +72,7 @@ class ButtonBar extends React.Component<IAppProps, {}> {
   public render() {
     return (
       <Wrapper>
-        <StyledButton type={"Danger"}>Reset</StyledButton>
+        <StyledButton onClick={this.props.actionReset} type={"Danger"}>Reset</StyledButton>
         {!this.props.submitEnabled ? (
           <DisabledButton>Save to Database</DisabledButton>
         ) : (
