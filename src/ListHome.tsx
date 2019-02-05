@@ -15,7 +15,7 @@ import ButtonBar from "./ButtonBar";
 import DataInputBox from "./DataInputBox";
 import HeaderBar from "./HeaderBar";
 
-import { withRouter } from 'react-router-dom'
+import { withRouter } from "react-router-dom";
 
 const Parent = styled.div`
   display: flex;
@@ -36,10 +36,10 @@ const BoxChild = styled.div`
   -webkit-box-shadow: 1px 1px 6px #000000;
   box-shadow: 1px 1px 6px #000000;
   border: ${props =>
-    props.hasValue
-      ? !props.invalid && props.valid
-        ? "3px solid green"
-        : "3px solid red"
+    props.validityState === 1
+    ? "3px solid green"
+    : props.validityState === 2
+      ? "3px solid red"
       : "none"};
 `;
 
@@ -54,19 +54,17 @@ const Listings = (props: any) => {
   const dataBoxes = props.datapoints.map((e: any, i: any) => (
     <BoxChild
       key={e.id}
-      valid={e.valid}
-      invalid={e.invalid}
       hasValue={e.value.length > 0}
+      validityState={e.validityState}
     >
       <BoxTitle>
         <div>{e.name}</div>
       </BoxTitle>
       <DataInputBox
         name={e.id}
-        invalid={e.invalid}
         action={props.action}
         units={e.units}
-        valid={e.valid}
+        validityState={e.validityState}
         value={e.value}
       />
       <div>
@@ -96,6 +94,7 @@ interface IAppState {
   curTitle: string;
   curUser: any;
   datapoints: any[];
+  formIsValid: boolean;
   loading: boolean;
   searchFilter: "";
 }
@@ -107,6 +106,7 @@ class ListHome extends React.Component<IAppProps, IAppState> {
       curTitle: "",
       curUser: {},
       datapoints: [],
+      formIsValid: false,
       loading: true,
       searchFilter: ""
     };
@@ -140,7 +140,6 @@ class ListHome extends React.Component<IAppProps, IAppState> {
                 const pushData = {
                   id: thing.Id,
                   internalName: thing.EntityPropertyName,
-                  invalid: false,
                   max: thing.MaximumValue,
                   min: thing.MinimumValue,
                   name: thing.Title,
@@ -148,13 +147,13 @@ class ListHome extends React.Component<IAppProps, IAppState> {
                   units: thing.Description.length
                     ? JSON.parse(thing.Description).units
                     : null,
-                  valid: false,
+                  validityState: 0,
                   value: ""
                 };
                 objectCopy.datapoints.push(pushData);
                 this.setState(objectCopy);
               }
-              console.log(this.state);
+              // console.log(this.state);
             });
         });
       });
@@ -194,26 +193,38 @@ class ListHome extends React.Component<IAppProps, IAppState> {
     }
   }
 
+  public updateFormValidity() {
+    let numInvalid = 0
+    this.state.datapoints.forEach((datapoint:any) => {
+      datapoint.validityState === 2
+      ? numInvalid++
+      : numInvalid = numInvalid
+    })
+    console.log(numInvalid)
+    numInvalid > 0 ? this.setState({ formIsValid: false }) : this.setState({ formIsValid: true })
+  }
+
   public handleDataInput(event: any) {
     this.state.datapoints.forEach((item, index) => {
       if (item.id === event.target.name) {
         const datapoints = [...this.state.datapoints];
         datapoints[index] = {
           ...datapoints[index],
-          valid: this.checkValid(event.target.value, item.min, item.max)
-        };
-        datapoints[index] = {
-          ...datapoints[index],
-          invalid: !this.checkValid(event.target.value, item.min, item.max)
+          validityState:
+            event.target.value.length > 0
+              ? this.checkValid(event.target.value, item.min, item.max)
+                ? 1
+                : 2
+              : 0
         };
         datapoints[index] = { ...datapoints[index], value: event.target.value };
-        this.setState({ datapoints });
+        this.setState({ datapoints }, this.updateFormValidity);
       }
     });
   }
 
-  public createPayload(datapoints:any[]) {
-    const arrayToObject = (array:any[], keyField:any) =>
+  public createPayload(datapoints: any[]) {
+    const arrayToObject = (array: any[], keyField: any) =>
       array.reduce((obj, item) => {
         obj[item[keyField]] = parseFloat(item.value);
         return obj;
@@ -232,7 +243,7 @@ class ListHome extends React.Component<IAppProps, IAppState> {
       });
     // console.log("this is just a test");
     // console.log(this.createPayload(this.state.datapoints))
-    this.props.history.push('/')
+    this.props.history.push("/");
   }
 
   public render() {
@@ -258,7 +269,7 @@ class ListHome extends React.Component<IAppProps, IAppState> {
               .sort((a: any, b: any) => a.order - b.order)}
           />
         )}
-        {!this.state.loading && <ButtonBar actionSubmit={this.submitRecord} />}
+        {!this.state.loading && <ButtonBar submitEnabled={this.state.formIsValid} actionSubmit={this.submitRecord} />}
       </Parent>
     );
   }
