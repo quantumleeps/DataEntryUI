@@ -49,6 +49,7 @@ class App extends React.Component<{}, IAppState> {
     return (
       <Router>
         <Wrapper>
+
           {/* <Header user={this.state.curUser}/> */}
           <Route path="/" exact={true} component={Home} />
           {/* <Route path="/" exact={true} component={PlantHome} /> */}

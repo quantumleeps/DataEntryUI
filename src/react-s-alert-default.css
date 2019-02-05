@@ -45,11 +45,11 @@
 }
 
 .s-alert-close {
-    width: 20px;
-    height: 20px;
+    width: 40px;
+    height: 40px;
     position: absolute;
-    right: 4px;
-    top: 4px;
+    right: 10px;
+    top: 10px;
     overflow: hidden;
     text-indent: 100%;
     cursor: pointer;
