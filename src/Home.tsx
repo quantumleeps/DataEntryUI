@@ -14,42 +14,14 @@ import adalContext from "./adalConfig";
 import { Web } from "@pnp/sp";
 import { endpoint } from "./adalConfig";
 
+import HeaderBar from "./HeaderBar"
+
 const Parent = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
   padding: 5px;
-`;
-
-const Child = styled.div`
-  background: white;
-  padding: 10px 20px;
-  flex-grow: 1;
-  -moz-box-shadow: 1px 1px 6px #000000;
-  -webkit-box-shadow: 1px 1px 6px #000000;
-  box-shadow: 1px 1px 6px #000000;
-`;
-
-const SiteTitle = styled(Child)`
-  border-radius: 6px 0 0 6px;
-  text-align: left;
-  font-size: 26px;
-
-  @media (max-width: 640px) {
-    border-radius: 6px 6px 0 0;
-  }
-`;
-
-const AuthenticatedUsername = styled(Child)`
-  border-radius: 0 6px 6px 0;
-  text-align: right;
-  font-weight: bold;
-
-  @media (max-width: 640px) {
-    border-radius: 0 0 6px 6px;
-    text-align: left;
-  }
 `;
 
 const SearchChild = styled.div`
@@ -100,21 +72,6 @@ const SearchBox = styled.input`
 //       color: white;
 //   }
 // `;
-
-const SmallButton = styled.button`
-  padding: 2px 6px;
-  background: white;
-  color: black
-  border: 1px solid black;
-  font-size: 9px;
-  border-radius: 3px;
-  cursor: pointer;
-
-  :hover {
-      background: black;
-      color: white;
-  }
-`;
 
 const BoxTitle = styled(Link)`
   font-size: 30px;
@@ -201,11 +158,12 @@ class Home extends React.Component<IAppProps, IAppState> {
   public render() {
     return (
       <Parent>
-        <SiteTitle>Operations Data Collection</SiteTitle>
+        {/* <SiteTitle>Operations Data Collection</SiteTitle>
         <AuthenticatedUsername>
           {this.state.curUser.userName}{" "}
           <SmallButton onClick={this.onLogOut}>logout</SmallButton>
-        </AuthenticatedUsername>
+        </AuthenticatedUsername> */}
+        <HeaderBar home={true} title={"Operations Data Collection"} user={this.state.curUser.userName} logoutAction={this.onLogOut}/>
         <SearchChild>
           <SearchBox onChange={this.handleSearch} type="text" placeholder="Search..." />
         </SearchChild>

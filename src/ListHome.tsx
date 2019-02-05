@@ -2,9 +2,6 @@ import * as React from "react";
 
 import styled from "styled-components";
 
-// import { FaCheck } from "react-icons/fa";
-import { FaArrowLeft } from "react-icons/fa";
-
 import { UserInfo } from "react-adal";
 
 import adalContext from "./adalConfig";
@@ -12,9 +9,9 @@ import adalContext from "./adalConfig";
 import { Web } from "@pnp/sp";
 import { endpoint } from "./adalConfig";
 
-import { Link } from "react-router-dom";
-
+import ButtonBar from "./ButtonBar";
 import DataInputBox from "./DataInputBox";
+import HeaderBar from "./HeaderBar";
 
 const Parent = styled.div`
   display: flex;
@@ -24,100 +21,22 @@ const Parent = styled.div`
   padding: 5px;
 `;
 
-const Child = styled.div`
-  background: white;
-  padding: 10px 20px;
-  flex-grow: 1;
-  -moz-box-shadow: 1px 1px 6px #000000;
-  -webkit-box-shadow: 1px 1px 6px #000000;
-  box-shadow: 1px 1px 6px #000000;
-`;
-
-const SiteTitle = styled(Child)`
-  border-radius: 6px 0 0 6px;
-  text-align: left;
-  font-size: 26px;
-  display: flex;
-  align-items: center;
-
-  @media (max-width: 640px) {
-    border-radius: 6px 6px 0 0;
-  }
-`;
-
-const AuthenticatedUsername = styled(Child)`
-  border-radius: 0 6px 6px 0;
-  text-align: right;
-  font-weight: bold;
-
-  @media (max-width: 640px) {
-    border-radius: 0 0 6px 6px;
-    text-align: left;
-  }
-`;
-
-const SearchChild = styled.div`
-  width: 100%;
-  background: white;
-  margin: 10px 0;
-  padding: 10px 20px;
-  border-radius: 6px;
-  -moz-box-shadow: 1px 1px 6px #000000;
-  -webkit-box-shadow: 1px 1px 6px #000000;
-  box-shadow: 1px 1px 6px #000000;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
 const BoxChild = styled.div`
   //   align-self: flex-end;
   width: 140%;
   background: white;
-  margin-bottom: 10px;
+  margin-top: 10px;
   padding: 10px 20px;
   border-radius: 6px;
   -moz-box-shadow: 1px 1px 6px #000000;
   -webkit-box-shadow: 1px 1px 6px #000000;
   box-shadow: 1px 1px 6px #000000;
-  border: ${props => (props.hasValue ? !props.invalid && props.valid ? "3px solid green" : "3px solid red" : "none")}
-`;
-
-const SearchBox = styled.input`
-  height: 24px;
-  font-size: 20px;
-  width: 80%;
-  border-radius: 4px;
-`;
-
-const Button = styled.button`
-  padding: 5px 18px;
-  background: white;
-  color: green
-  border: 2px solid green;
-  font-size: 12px;
-  border-radius: 5px;
-  cursor: pointer;
-
-  :hover {
-      background: green;
-      color: white;
-  }
-`;
-
-const SmallButton = styled.button`
-  padding: 2px 6px;
-  background: white;
-  color: black
-  border: 1px solid black;
-  font-size: 9px;
-  border-radius: 3px;
-  cursor: pointer;
-
-  :hover {
-      background: black;
-      color: white;
-  }
+  border: ${props =>
+    props.hasValue
+      ? !props.invalid && props.valid
+        ? "3px solid green"
+        : "3px solid red"
+      : "none"};
 `;
 
 const BoxTitle = styled.div`
@@ -127,35 +46,16 @@ const BoxTitle = styled.div`
   justify-content: space-between;
 `;
 
-// const BoxInput = styled.input`
-//   height: 53px;
-//   font-size: 45px;
-//   width: 100%;
-//   border: 2px dotted black;
-//   border-radius: 5px;
-
-//   :focus {
-//     border: 2px solid blue;
-//     outline: none;
-//     border-radius: 5px;
-//   }
-// `;
-
-const TitleLink = styled(Link)`
-  text-decoration: none;
-  color: black;
-
-  :hover {
-    text-decoration: underline;
-  }
-`;
-
 const Listings = (props: any) => {
   const dataBoxes = props.datapoints.map((e: any, i: any) => (
-    <BoxChild key={e.id} valid={e.valid} invalid={e.invalid} hasValue={e.value.length>0}>
+    <BoxChild
+      key={e.id}
+      valid={e.valid}
+      invalid={e.invalid}
+      hasValue={e.value.length > 0}
+    >
       <BoxTitle>
         <div>{e.name}</div>
-        {/* {e.valid && <FaCheck style={{ color: "green" }} />} */}
       </BoxTitle>
       <DataInputBox
         name={e.id}
@@ -165,6 +65,19 @@ const Listings = (props: any) => {
         valid={e.valid}
         value={e.value}
       />
+      <div>
+        {e.min > -1.7e307 && (
+          <span>
+            <b>min: </b> {e.min}
+          </span>
+        )}
+        {e.min > -1.7e307 && e.max < 1.7e307 && <span>, </span>}
+        {e.max < 1.7e307 && (
+          <span>
+            <b>max: </b> {e.max}
+          </span>
+        )}
+      </div>
     </BoxChild>
   ));
   return dataBoxes;
@@ -190,7 +103,7 @@ class ListHome extends React.Component<IAppProps, IAppState> {
       curUser: {},
       datapoints: [],
       loading: true,
-      searchFilter: "",
+      searchFilter: ""
     };
     this.handleClick = this.handleClick.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
@@ -252,24 +165,17 @@ class ListHome extends React.Component<IAppProps, IAppState> {
     adalContext.LogOut();
   }
 
-  // public isValid(value:number, min:number, max:number) {
-  //   value > min && value < max
-  //   ? true
-  //   : false
-  // }
-
   public handleClick() {
     console.log("it got clicked");
   }
 
   public handleSearch(event: any) {
     this.setState({ searchFilter: event.target.value });
-    // console.log(this.state);
   }
 
   public checkValid(value: number, min: number, max: number) {
-    if (value > min) {
-      if (value < max) {
+    if (value >= min) {
+      if (value <= max) {
         return true;
       } else {
         return false;
@@ -282,50 +188,40 @@ class ListHome extends React.Component<IAppProps, IAppState> {
   public handleDataInput(event: any) {
     this.state.datapoints.forEach((item, index) => {
       if (item.id === event.target.name) {
-
         const datapoints = [...this.state.datapoints];
-        datapoints[index] = { ...datapoints[index], valid: this.checkValid(event.target.value, item.min, item.max) };
-        datapoints[index] = { ...datapoints[index], invalid: !this.checkValid(event.target.value, item.min, item.max) };
-        datapoints[index] = { ...datapoints[index], value: event.target.value}
+        datapoints[index] = {
+          ...datapoints[index],
+          valid: this.checkValid(event.target.value, item.min, item.max)
+        };
+        datapoints[index] = {
+          ...datapoints[index],
+          invalid: !this.checkValid(event.target.value, item.min, item.max)
+        };
+        datapoints[index] = { ...datapoints[index], value: event.target.value };
         this.setState({ datapoints });
       }
     });
-    // console.log(this.state);
   }
 
   public render() {
     return (
       <Parent>
-        <SiteTitle>
-          <TitleLink to="/">
-            <FaArrowLeft style={{ color: "black", marginRight: "5px" }} />
-            {this.state.curTitle}
-          </TitleLink>
-        </SiteTitle>
-        <AuthenticatedUsername>
-          {this.state.curUser.userName}{" "}
-          <SmallButton onClick={this.onLogOut}>logout</SmallButton>
-        </AuthenticatedUsername>
-        <SearchChild>
-          <SearchBox
-            onChange={this.handleSearch}
-            type="text"
-            placeholder="Search..."
-          />
-          <Button onClick={this.handleClick}>Save</Button>
-        </SearchChild>
+        <HeaderBar home={false} title={this.state.curTitle} user={this.state.curUser.userName} logoutAction={this.onLogOut}/>
         {this.state.loading ? (
           <h1>Loading...</h1>
         ) : (
           <Listings
             action={this.handleDataInput}
-            datapoints={this.state.datapoints.filter(e =>
-              e.name.toLowerCase().includes(this.state.searchFilter.toLowerCase())
-            ).sort(
-              (a: any, b: any) => a.order - b.order
-            )}
+            datapoints={this.state.datapoints
+              .filter(e =>
+                e.name
+                  .toLowerCase()
+                  .includes(this.state.searchFilter.toLowerCase())
+              )
+              .sort((a: any, b: any) => a.order - b.order)}
           />
         )}
+        {!this.state.loading && <ButtonBar />}
       </Parent>
     );
   }

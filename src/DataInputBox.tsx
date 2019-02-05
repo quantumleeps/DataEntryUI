@@ -2,7 +2,9 @@ import * as React from "react"
 
 import styled from "styled-components"
 
-import { FaCheck } from "react-icons/fa"
+import { MdCheck } from "react-icons/md"
+
+import { MdClear } from "react-icons/md"
 
 const InputWrapper = styled.div`
     width: 100%;
@@ -15,7 +17,7 @@ const Icon = styled.div`
     color: white;
     min-width: 50px;
     border-radius: 6px 0 0 6px;
-    font-size: 30px;
+    font-size: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -63,8 +65,8 @@ class DataInputBox extends React.Component<IAppProps,{}> {
     public render() {
         return (
             <InputWrapper>
-                {this.props.value.length > 0 && this.props.valid && !this.props.invalid && <Icon color="green"><FaCheck /></Icon>}
-                {this.props.value.length > 0 && !this.props.valid && this.props.invalid && <Icon color="red"><FaCheck /></Icon>}
+                {this.props.value.length > 0 && this.props.valid && !this.props.invalid && <Icon color="green"><MdCheck /></Icon>}
+                {this.props.value.length > 0 && !this.props.valid && this.props.invalid && <Icon color="red"><MdClear /></Icon>}
                 <InputBox value={this.props.value} name={this.props.name} onChange={this.props.action}/>
                 {this.props.units !== null && <Units>{this.props.units}</Units>}
             </InputWrapper>
