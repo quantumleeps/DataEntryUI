@@ -1,19 +1,18 @@
 import * as React from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import styled from "styled-components";
 
 // import Header from "./Header";
 import Home from "./Home";
-import ListHome from "./ListHome"
+import ListHome from "./ListHome";
 
 import { UserInfo } from "react-adal";
 
 import adalContext from "./adalConfig";
 
-import Alert from 'react-s-alert';
+import Alert from "react-s-alert";
 
-import './react-s-alert-default.css';
-
+import "./react-s-alert-default.css";
 
 const Wrapper = styled.section`
   padding: 0.5em;
@@ -23,7 +22,7 @@ const Wrapper = styled.section`
 
 interface IAppState {
   curUser: Partial<UserInfo>;
-  loading: boolean
+  loading: boolean;
   webTitle: string;
 }
 class App extends React.Component<{}, IAppState> {
@@ -49,12 +48,14 @@ class App extends React.Component<{}, IAppState> {
     return (
       <Router>
         <Wrapper>
-
-          {/* <Header user={this.state.curUser}/> */}
-          <Route path="/" exact={true} component={Home} />
-          {/* <Route path="/" exact={true} component={PlantHome} /> */}
-          <Route path="/list/:id" exact={true} component={ListHome} />
-          <Alert stack={{limit: 3}} />
+          <Switch>
+            {/* <Header user={this.state.curUser}/> */}
+            <Route path="/" exact={true} component={Home} />
+            {/* <Route path="/" exact={true} component={PlantHome} /> */}
+            <Route path="/list/:id" exact={true} component={ListHome} />
+            <Route component={Home} />
+            <Alert stack={{ limit: 3 }} />
+          </Switch>
         </Wrapper>
       </Router>
     );
