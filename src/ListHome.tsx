@@ -11,6 +11,8 @@ import ButtonBar from "./ButtonBar";
 import DataInputBox from "./DataInputBox";
 import HeaderBar from "./HeaderBar";
 
+import PullDown from "./components/PullDown";
+
 const Parent = styled.div`
   display: flex;
   flex-direction: row;
@@ -88,10 +90,12 @@ interface IAppProps {
 interface IAppState {
   curTitle: string;
   curUser: any;
+  curViewTitle: string;
   datapoints: any[];
   formIsValid: boolean;
   loading: boolean;
   searchFilter: "";
+  views: any[];
 }
 
 class ListHome extends React.Component<IAppProps, IAppState> {
@@ -100,17 +104,19 @@ class ListHome extends React.Component<IAppProps, IAppState> {
     this.state = {
       curTitle: "",
       curUser: {},
+      curViewTitle: "",
       datapoints: [],
       formIsValid: false,
       loading: true,
-      searchFilter: ""
+      searchFilter: "",
+      views: []
     };
 
     this.handleSearch = this.handleSearch.bind(this);
     this.handleDataInput = this.handleDataInput.bind(this);
     this.submitRecord = this.submitRecord.bind(this);
     this.refreshPage = this.refreshPage.bind(this);
-    this.handleButtonClickem = this.handleButtonClickem.bind(this);
+    this.handleViewChange = this.handleViewChange.bind(this);
   }
 
   //    this performs the first time a page loads or if
@@ -125,10 +131,10 @@ class ListHome extends React.Component<IAppProps, IAppState> {
     return web.lists.getById(listId).defaultView.get();
   }
 
-  public getViewField(web: any, listId: string, viewId: string) {
+  public getViewField(web: any, listId: string, viewTitle: string) {
     return web.lists
       .getById(listId)
-      .views.getById(viewId)
+      .views.getByTitle(viewTitle)
       .fields.get();
   }
 
@@ -139,8 +145,8 @@ class ListHome extends React.Component<IAppProps, IAppState> {
       .get();
   }
 
-  public loadDatapointsToState(web: any, listId: string, viewId: string) {
-    this.getViewField(web, listId, viewId).then((viewField: any) => {
+  public loadDatapointsToState(web: any, listId: string, viewTitle: string) {
+    this.getViewField(web, listId, viewTitle).then((viewField: any) => {
       viewField.Items.forEach((fieldInternalName: any, index: number) => {
         this.getField(
           opsWeb,
@@ -174,9 +180,30 @@ class ListHome extends React.Component<IAppProps, IAppState> {
   public componentWillMount() {
     this.getDefaultView(opsWeb, this.props.match.params.id).then(
       (view: any) => {
-        this.loadDatapointsToState(opsWeb, this.props.match.params.id, view.Id);
+        this.loadDatapointsToState(
+          opsWeb,
+          this.props.match.params.id,
+          view.Title
+        );
+        this.setState({ curViewTitle: view.Title });
       }
     );
+
+    opsWeb.lists
+      .getById(this.props.match.params.id)
+      .views.get()
+      .then((views: any) => {
+        views.forEach((view: any) => {
+          const objectCopy = Object.assign({}, this.state);
+          const pushData = {
+            id: view.Id,
+            name: view.Title
+          };
+          objectCopy.views.push(pushData);
+          this.setState(objectCopy);
+        });
+        console.log(this.state)
+      });
 
     opsWeb.lists
       .getById(this.props.match.params.id)
@@ -249,9 +276,9 @@ class ListHome extends React.Component<IAppProps, IAppState> {
     });
   }
 
-  public newView(viewId:string) {
-    this.setState({ datapoints: [] })
-    this.loadDatapointsToState(opsWeb, this.props.match.params.id, viewId)
+  public newView(viewTitle: string) {
+    this.setState({ datapoints: [] });
+    this.loadDatapointsToState(opsWeb, this.props.match.params.id, viewTitle);
   }
 
   public createPayload(datapoints: any[]) {
@@ -286,8 +313,10 @@ class ListHome extends React.Component<IAppProps, IAppState> {
     location.reload();
   }
 
-  public handleButtonClickem() {
-    this.newView("5bf68c7a-b494-4487-b97f-74335c6ed8ac")
+  public handleViewChange(event: any) {
+    this.setState({ curViewTitle: event.target.value })
+    this.newView(event.target.value)
+    // console.log(event.target.value);
   }
 
   public render() {
@@ -299,7 +328,11 @@ class ListHome extends React.Component<IAppProps, IAppState> {
           user={this.state.curUser.userName}
           logoutAction={this.onLogOut}
         />
-        {/* <button onClick={this.handleButtonClickem}>Click me</button> */}
+        <PullDown
+          handleChange={this.handleViewChange}
+          selectedView={this.state.curViewTitle}
+          views={this.state.views}
+        />
         {this.state.loading ? (
           <h1>Loading...</h1>
         ) : (
