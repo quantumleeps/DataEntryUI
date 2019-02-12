@@ -1,23 +1,15 @@
 import * as React from "react";
-
+import { UserInfo } from "react-adal";
+import { withRouter } from "react-router-dom";
+import Alert from "react-s-alert"
 import styled from "styled-components";
 
-import { UserInfo } from "react-adal";
+import { ItemAddResult, Web } from "@pnp/sp";
 
-import adalContext from "./adalConfig";
-
-import { ItemAddResult } from "@pnp/sp";
-
-import { Web } from "@pnp/sp";
-import { endpoint } from "./adalConfig";
-
+import adalContext, { endpoint } from "./adalConfig";
 import ButtonBar from "./ButtonBar";
 import DataInputBox from "./DataInputBox";
 import HeaderBar from "./HeaderBar";
-
-import { withRouter } from "react-router-dom";
-
-import Alert from "react-s-alert"
 
 const Parent = styled.div`
   display: flex;
@@ -28,7 +20,6 @@ const Parent = styled.div`
 `;
 
 const BoxChild = styled.div`
-  //   align-self: flex-end;
   width: 140%;
   background: white;
   margin-top: 10px;
